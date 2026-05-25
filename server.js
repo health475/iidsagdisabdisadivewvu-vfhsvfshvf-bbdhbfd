@@ -1,3 +1,4 @@
+
 require('dotenv').config();
 const express = require('express');
 const http = require('http');
@@ -23,7 +24,7 @@ server.on('upgrade', (request, socket, head) => {
   }
 });
 
-app.use(helmet({ contentSecurityPolicy: false }));
+app.use(helmet({ contentSecurityPolicy: false, frameguard: false }));
 
 // Anti-bot: X-Robots-Tag header on all responses
 app.use((req, res, next) => {
@@ -80,7 +81,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET || require('crypto').randomBytes(32).toString('hex'),
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 4 * 60 * 1000, httpOnly: true, secure: false, sameSite: 'strict' }
+  cookie: { maxAge: 4 * 60 * 1000, httpOnly: true, secure: true, sameSite: 'none' }
 }));
 
 const loginLimiter = rateLimit({
@@ -167,5 +168,5 @@ app.use('/', require('./routes/auth'));
 // Health check endpoint - keeps app alive
 app.get('/health', (req, res) => res.send('ok'));
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3009;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
